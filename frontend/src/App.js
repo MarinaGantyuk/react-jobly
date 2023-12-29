@@ -6,7 +6,7 @@ import Routes from "./routes-nav/Routes";
 import LoadingSpinner from "./common/LoadingSpinner";
 import JoblyApi from "./api/api";
 import UserContext from "./auth/UserContext";
-// import jwt from "jsonwebtoken";
+import { decodeToken } from "react-jwt";
 
 // Key name for storing token in localStorage for "remember me" re-login
 export const TOKEN_STORAGE_ID = "jobly-token";
@@ -31,6 +31,7 @@ function App() {
   const [applicationIds, setApplicationIds] = useState(new Set([]));
   const [currentUser, setCurrentUser] = useState(null);
   const [token, setToken] = useLocalStorage(TOKEN_STORAGE_ID);
+  const navigate = useNavigate;
 
   console.debug(
     "App",
@@ -52,12 +53,13 @@ function App() {
     async function getCurrentUser() {
       if (token) {
         try {
-          let { username } = {}; //jwt.decode(token);
+          let { username } = decodeToken(token);
           // put the token on the Api class so it can use it to call the API.
           JoblyApi.token = token;
           let currentUser = await JoblyApi.getCurrentUser(username);
           setCurrentUser(currentUser);
           setApplicationIds(new Set(currentUser.applications));
+          //navigate("/companies");
         } catch (err) {
           console.error("App loadUserInfo: problem loading", err);
           setCurrentUser(null);
@@ -89,6 +91,11 @@ function App() {
     try {
       let token = await JoblyApi.signup(signupData);
       setToken(token);
+      let { username } = decodeToken(token);
+      // put the token on the Api class so it can use it to call the API.
+      JoblyApi.token = token;
+      let currentUser = await JoblyApi.getCurrentUser(username);
+      setCurrentUser(currentUser);
       return { success: true };
     } catch (errors) {
       console.error("signup failed", errors);
@@ -104,6 +111,11 @@ function App() {
     try {
       let token = await JoblyApi.login(loginData);
       setToken(token);
+      let { username } = decodeToken(token);
+      // put the token on the Api class so it can use it to call the API.
+      JoblyApi.token = token;
+      let currentUser = await JoblyApi.getCurrentUser(username);
+      setCurrentUser(currentUser);
       return { success: true };
     } catch (errors) {
       console.error("login failed", errors);

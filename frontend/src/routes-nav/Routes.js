@@ -1,4 +1,9 @@
-import { Routes as Switch, Route, useNavigate } from "react-router-dom";
+import {
+  Routes as Switch,
+  Route,
+  useNavigate,
+  Navigate,
+} from "react-router-dom";
 import Homepage from "../homepage/Homepage";
 import CompanyList from "../companies/CompanyList";
 import JobList from "../jobs/JobList";
@@ -33,20 +38,46 @@ function Routes({ login, signup }) {
   return (
     <div className="pt-5">
       <Switch>
+        <Route
+          element={
+            <PrivateRoute>
+              <CompanyList />
+            </PrivateRoute>
+          }
+          path="/companies"
+        />
+        <Route element={<LoginForm login={login} />} path="/login" />
+
         <Route element={<Homepage />} path="/" />
 
-        <Route element={<LoginForm login={login} />} path="/login" />
         <Route element={<SignupForm signup={signup} />} path="/signup" />
 
-        <Route element={<CompanyList />} path="/companies" />
+        <Route
+          element={
+            <PrivateRoute>
+              <JobList />
+            </PrivateRoute>
+          }
+          path="/jobs"
+        />
 
-        <Route element={<JobList />} path="/jobs" />
+        <Route
+          element={
+            <PrivateRoute>
+              <CompanyDetail />
+            </PrivateRoute>
+          }
+          path="/companies/:handle"
+        />
 
-        <Route element={<CompanyDetail />} path="/companies/:handle" />
-
-        <Route element={<ProfileForm />} path="/profile" />
-
-        {/* <Navigate to="/" /> */}
+        <Route
+          element={
+            <PrivateRoute>
+              <ProfileForm />
+            </PrivateRoute>
+          }
+          path="/profile"
+        />
       </Switch>
     </div>
   );
